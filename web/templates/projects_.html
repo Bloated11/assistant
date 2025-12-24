@@ -1,0 +1,91 @@
+{% extends "base_.html" %}
+
+{% block title %}Projects - PHENOM AI{% endblock %}
+
+{% block content %}
+<h1>PROJECT MANAGER</h1>
+
+<div class="glass-card">
+    <h2>Create New Project</h2>
+    <div style="display: grid; grid-template-columns: 2fr 2fr auto; gap: 1rem; margin-top: 1rem;">
+        <input type="text" id="projectName" placeholder="Project name..."
+            onkeypress="if(event.key==='Enter') addProject()">
+        <input type="text" id="projectDesc" placeholder="Description...">
+        <button onclick="addProject()" style="min-width: 120px;">
+            <i class="fas fa-plus"></i> Add Project
+        </button>
+    </div>
+</div>
+
+<div class="glass-card">
+    <h2>Active Projects</h2>
+    <div id="projectsList" style="margin-top: 1rem;"></div>
+    <div id="emptyState" style="display: none; text-align: center; padding: 3rem; color: #b8d4e8;">
+        No active projects
+    </div>
+</div>
+
+<script>
+    async function loadProjects() {
+        const res = await fetch('/projects/api/all', { credentials: 'include' });
+        const projects = await res.json();
+        const list = document.getElementById('projectsList');
+        const emptyState = document.getElementById('emptyState');
+
+        const projectArray = Object.values(projects.projects || {});
+
+        if (!projectArray || projectArray.length === 0) {
+            list.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        list.style.display = 'block';
+        emptyState.style.display = 'none';
+
+        list.innerHTML = projectArray.map(project => `
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; margin-bottom: 0.8rem; background: rgba(135, 206, 250, 0.05); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px;">
+            <div style="flex: 1;">
+                <div style="font-size: 1.1rem; margin-bottom: 0.3rem; color: #87CEEB;">${project.name}</div>
+                <div style="font-size: 0.9rem; color: #b8d4e8;">${project.description || 'No description'}</div>
+                <div style="font-size: 0.85rem; color: #b8d4e8; margin-top: 0.3rem;">
+                    Status: ${project.status || 'active'}
+                    ${project.deadline ? ` | Deadline: ${project.deadline}` : ''}
+                </div>
+            </div>
+            <button onclick="deleteProject('${project.id}')" 
+                    style="background: rgba(135, 206, 250, 0.1); border: 1px solid rgba(135, 206, 250, 0.3); padding: 0.5rem 1rem;">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+    }
+
+    async function addProject() {
+        const name = document.getElementById('projectName').value.trim();
+        const description = document.getElementById('projectDesc').value.trim();
+        if (!name) return;
+
+        await fetch('/projects/api/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ name, description })
+        });
+
+        document.getElementById('projectName').value = '';
+        document.getElementById('projectDesc').value = '';
+        loadProjects();
+    }
+
+    async function deleteProject(id) {
+        await fetch(`/projects/api/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        loadProjects();
+    }
+
+    loadProjects();
+</script>
+{% endblock %}

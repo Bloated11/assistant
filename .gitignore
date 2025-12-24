@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing and Cache
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.zencoder/
+.zenflow/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Data and logs
+data/
+logs/
+*.log
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# phenom specific
+config/config.local.yaml
+.env.bak

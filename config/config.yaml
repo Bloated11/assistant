@@ -1,0 +1,22 @@
+ai:
+  mode: "local"
+  local:
+    enabled: true
+    model: "phi3:mini"
+    base_url: "http://localhost:11434"
+    num_ctx: 2048
+    num_thread: 2
+    num_gpu: 0
+  cloud:
+    enabled: false
+    provider: "none"
+  # Optional: allow injecting selected environment variables (or any env starting with PHENOM_) into
+  # the system prompt to personalize responses. This is opt-in and disabled by default.
+  personal_injection:
+    enabled: true
+    # env_keys: ['PHENOM_NAME', 'PHENOM_AGE']   # explicit keys to inject (if not set, PHENOM_* prefix is used)
+    env_keys: []
+    directive: "Use the user's personal information to provide personalized replies when appropriate."
+
+vector_db:
+  provider: "faiss"

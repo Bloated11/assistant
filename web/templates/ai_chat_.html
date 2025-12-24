@@ -1,0 +1,191 @@
+{% extends "base_.html" %}
+
+{% block title %}AI Assistant - PHENOM AI{% endblock %}
+
+{% block content %}
+<h1>AI NEURAL INTERFACE</h1>
+
+<div class="glass-card">
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 style="margin: 0;">Communication Channel</h2>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                <input type="checkbox" id="useCloud" style="width: auto; cursor: pointer; accent-color: #87CEEB;">
+                <span style="color: #87CEEB;">Cloud AI</span>
+            </label>
+            <select id="cloudProvider"
+                style="background: rgba(135, 206, 250, 0.1); border: 1px solid rgba(135, 206, 250, 0.3); color: #87CEEB; padding: 0.5rem; border-radius: 4px; cursor: pointer; display: none;">
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Anthropic</option>
+                <option value="openrouter">OpenRouter</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="chatMessages"
+        style="height: 500px; overflow-y: auto; margin-bottom: 1.5rem; padding: 1rem; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px;">
+        <div style="text-align: center; padding: 2rem; color: #87CEEB;">
+            <i class="fas fa-link" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+            Neural link established. Ready for communication.
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem;">
+        <input type="text" id="messageInput" placeholder="Enter your query..."
+            onkeypress="if(event.key==='Enter') sendMessage()" style="position: relative; z-index: 10001;">
+        <button onclick="sendMessage()" style="min-width: 120px; position: relative; z-index: 10001;">
+            <i class="fas fa-paper-plane"></i> Send
+        </button>
+    </div>
+</div>
+
+<div class="glass-card">
+    <h3>Quick Commands</h3>
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.8rem; margin-top: 1rem; font-size: 0.9rem;">
+        <div style="padding: 0.75rem; background: rgba(135, 206, 250, 0.05); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px; cursor: pointer;"
+            onclick="setCommand('add task ')">
+            <i class="fas fa-plus-circle" style="color: #87CEEB; margin-right: 0.5rem;"></i>
+            <span style="color: #e0f7ff;">add task [name]</span>
+        </div>
+        <div style="padding: 0.75rem; background: rgba(135, 206, 250, 0.05); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px; cursor: pointer;"
+            onclick="setCommand('add project ')">
+            <i class="fas fa-folder-plus" style="color: #87CEEB; margin-right: 0.5rem;"></i>
+            <span style="color: #e0f7ff;">add project [name]</span>
+        </div>
+        <div style="padding: 0.75rem; background: rgba(135, 206, 250, 0.05); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px; cursor: pointer;"
+            onclick="setCommand('add goal ')">
+            <i class="fas fa-flag" style="color: #87CEEB; margin-right: 0.5rem;"></i>
+            <span style="color: #e0f7ff;">add goal [title]</span>
+        </div>
+        <div style="padding: 0.75rem; background: rgba(135, 206, 250, 0.05); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px; cursor: pointer;"
+            onclick="sendCommand('list tasks')">
+            <i class="fas fa-list" style="color: #87CEEB; margin-right: 0.5rem;"></i>
+            <span style="color: #e0f7ff;">list tasks</span>
+        </div>
+        <div style="padding: 0.75rem; background: rgba(135, 206, 250, 0.05); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px; cursor: pointer;"
+            onclick="sendCommand('show projects')">
+            <i class="fas fa-list-alt" style="color: #87CEEB; margin-right: 0.5rem;"></i>
+            <span style="color: #e0f7ff;">show projects</span>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card">
+    <h3>System Status</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
+        <div
+            style="padding: 0.75rem; background: rgba(135, 206, 250, 0.05); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px;">
+            <div style="font-size: 0.85rem; color: #b8d4e8;">Mode</div>
+            <div style="color: #87CEEB; font-size: 1.1rem;" id="aiMode">LOCAL</div>
+        </div>
+        <div
+            style="padding: 0.75rem; background: rgba(135, 206, 250, 0.05); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px;">
+            <div style="font-size: 0.85rem; color: #b8d4e8;">Provider</div>
+            <div style="color: #87CEEB; font-size: 1.1rem;" id="providerDisplay">-</div>
+        </div>
+        <div
+            style="padding: 0.75rem; background: rgba(135, 206, 250, 0.05); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px;">
+            <div style="font-size: 0.85rem; color: #b8d4e8;">Status</div>
+            <div style="color: #87CEEB; font-size: 1.1rem;">ONLINE</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setCommand(cmd) {
+        document.getElementById('messageInput').value = cmd;
+        document.getElementById('messageInput').focus();
+    }
+
+    function sendCommand(cmd) {
+        document.getElementById('messageInput').value = cmd;
+        sendMessage();
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const messagesDiv = document.getElementById('chatMessages');
+        const useCloud = document.getElementById('useCloud').checked;
+        const provider = document.getElementById('cloudProvider').value;
+
+        messagesDiv.innerHTML += `
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+            <div style="background: rgba(135, 206, 250, 0.15); border: 1px solid rgba(135, 206, 250, 0.3); padding: 1rem; border-radius: 4px; max-width: 70%;">
+                <div style="font-size: 0.8rem; color: #b8d4e8; margin-bottom: 0.3rem;">USER</div>
+                <div style="color: #e0f7ff;">${message}</div>
+            </div>
+        </div>
+    `;
+        input.value = '';
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        const loadingId = 'loading-' + Date.now();
+        messagesDiv.innerHTML += `
+        <div id="${loadingId}" style="display: flex; justify-content: flex-start; margin-bottom: 1rem;">
+            <div style="background: rgba(135, 206, 250, 0.1); border: 1px solid rgba(135, 206, 250, 0.2); padding: 1rem; border-radius: 4px;">
+                <div style="color: #87CEEB;">Processing...</div>
+            </div>
+        </div>
+    `;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        const res = await fetch('/ai/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ message, use_cloud: useCloud, provider: provider })
+        });
+
+        document.getElementById(loadingId).remove();
+
+        const data = await res.json();
+        const response = data.response.replace(/\n/g, '<br>');
+        messagesDiv.innerHTML += `
+        <div style="display: flex; justify-content: flex-start; margin-bottom: 1rem;">
+            <div style="background: rgba(135, 206, 250, 0.1); border: 1px solid rgba(135, 206, 250, 0.3); padding: 1rem; border-radius: 4px; max-width: 70%;">
+                <div style="font-size: 0.8rem; color: #87CEEB; margin-bottom: 0.3rem;">PHENOM AI</div>
+                <div style="color: #e0f7ff;">${response}</div>
+            </div>
+        </div>
+    `;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        if (typeof updateAvatarPulse === 'function') {
+            updateAvatarPulse(0.8);
+            setTimeout(() => updateAvatarPulse(0), 800);
+        }
+    }
+
+    document.getElementById('useCloud').addEventListener('change', function () {
+        const isCloud = this.checked;
+        document.getElementById('aiMode').textContent = isCloud ? 'CLOUD' : 'LOCAL';
+        document.getElementById('cloudProvider').style.display = isCloud ? 'block' : 'none';
+        if (isCloud) {
+            updateProviderDisplay();
+        } else {
+            document.getElementById('providerDisplay').textContent = '-';
+        }
+    });
+
+    document.getElementById('cloudProvider').addEventListener('change', function () {
+        updateProviderDisplay();
+    });
+
+    function updateProviderDisplay() {
+        const provider = document.getElementById('cloudProvider').value;
+        const displayNames = {
+            'openai': 'OpenAI',
+            'anthropic': 'Anthropic',
+            'openrouter': 'OpenRouter'
+        };
+        document.getElementById('providerDisplay').textContent = displayNames[provider] || provider;
+    }
+
+    document.getElementById('messageInput').focus();
+</script>
+{% endblock %}

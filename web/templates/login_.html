@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PHENOM AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            color: #e0f7ff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+        }
+        
+        .logo {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 12px;
+            color: #87CEEB;
+            text-shadow: 0 0 30px rgba(135, 206, 250, 0.6);
+            margin-bottom: 3rem;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(135, 206, 250, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h2 {
+            color: #87CEEB;
+            font-weight: 300;
+            letter-spacing: 4px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        input {
+            width: 100%;
+            background: rgba(135, 206, 250, 0.05);
+            border: 1px solid rgba(135, 206, 250, 0.3);
+            color: #e0f7ff;
+            padding: 1rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #87CEEB;
+            background: rgba(135, 206, 250, 0.1);
+            box-shadow: 0 0 15px rgba(135, 206, 250, 0.2);
+        }
+        
+        button {
+            width: 100%;
+            background: rgba(135, 206, 250, 0.1);
+            border: 1px solid rgba(135, 206, 250, 0.3);
+            color: #87CEEB;
+            padding: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        
+        button:hover {
+            background: rgba(135, 206, 250, 0.2);
+            box-shadow: 0 0 20px rgba(135, 206, 250, 0.3);
+        }
+        
+        .error {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">PHENOM AI</div>
+        <div class="login-card">
+            <h2>AUTHENTICATE</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <input type="text" name="username" placeholder="Username" required autocomplete="username">
+                <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+                <button type="submit">ACCESS SYSTEM</button>
+            </form>
+            <div id="error" class="error"></div>
+        </div>
+    </div>
+    
+    <script>
+        async function handleLogin(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: new URLSearchParams(formData)
+            });
+            
+            if (res.ok) {
+                window.location.href = '/';
+            } else {
+                document.getElementById('error').textContent = 'Authentication failed';
+            }
+        }
+    </script>
+</body>
+</html>

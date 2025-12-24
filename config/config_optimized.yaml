@@ -1,0 +1,141 @@
+# Optimized Configuration for phenom
+# This configuration prioritizes speed over AI capabilities
+
+phenom:
+  name: "phenom"
+  wake_word: "phenom"
+  personality: "professional"
+  proactive_mode: false
+
+# Optimized Voice Settings
+voice:
+  enabled: false  # Disable voice to save resources
+  language: "en-US"
+  wake_word: "phenom"
+  recognition_timeout: 5
+  speech_rate: 150
+  volume: 0.8
+
+# AI SETTINGS - Hybrid Mode
+ai:
+  mode: "hybrid"  # Options: local, cloud, hybrid
+  decision_threshold: 0.5
+  
+  local:
+    enabled: true
+    model: "phi3:mini"
+    base_url: "http://localhost:11434"
+    temperature: 0.7
+    num_ctx: 2048
+    num_thread: 4
+    timeout: 60
+    max_tokens: 512
+  
+  cloud:
+    enabled: true
+    provider: "openai"
+    model: "gpt-3.5-turbo"
+    temperature: 0.7
+    max_tokens: 1024
+
+# System Automation
+automation:
+  enabled: true
+  require_confirmation: true
+  allowed_commands: []
+  timeout: 30
+
+# Web Search
+web_search:
+  enabled: true
+  default_engine: "duckduckgo"
+  max_results: 3  # Reduced from 5
+  timeout: 5
+
+# Task Management
+tasks:
+  enabled: true
+  storage: "data/tasks.json"
+  auto_save: true
+  reminder_enabled: true
+
+# Learning & Memory
+learning:
+  enabled: true
+  memory_file: "data/memory.json"
+  conversation_history: "data/conversations.json"
+  max_history: 50  # Reduced from 1000
+  auto_learn: true
+
+# Database
+database:
+  enabled: true
+  database_path: "data/phenom.db"
+  auto_backup: false  # Disable for speed
+
+# Other Modules
+vision:
+  enabled: true
+
+email:
+  enabled: true
+
+news:
+  enabled: false
+
+weather:
+  enabled: false
+
+media:
+  enabled: false
+
+security:
+  enabled: false
+
+notifications:
+  enabled: true  # Keep for alerts
+  desktop_notifications: true
+
+documents:
+  enabled: false
+
+network_tools:
+  enabled: false
+
+backup:
+  enabled: false
+
+plugins:
+  enabled: false
+
+personality:
+  enabled: true
+  mood: "efficient"  # Focus on efficiency
+
+proactive:
+  enabled: false  # Disable proactive features
+
+calendar:
+  enabled: false
+
+code_assistant:
+  enabled: false
+
+workflow:
+  enabled: false
+
+context_aware:
+  enabled: false
+
+file_manager:
+  enabled: false
+
+nlp:
+  enabled: true  # Keep for command processing
+
+# Logging
+logs:
+  level: "WARNING"  # Reduced logging
+  file: "logs/phenom.log"
+  max_size: "10MB"
+  backup_count: 2

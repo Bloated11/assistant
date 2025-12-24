@@ -1,0 +1,111 @@
+
+% extends "base_.html" %}
+
+{% block title %}Goals - PHENOM AI{% endblock %}
+
+{% block content %}
+<h1>GOAL TRACKER</h1>
+
+<div class="glass-card">
+    <h2>Create New Goal</h2>
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; margin-top: 1rem;">
+        <input type="text" id="goalTitle" placeholder="Goal title..." onkeypress="if(event.key==='Enter') addGoal()">
+        <input type="text" id="goalDesc" placeholder="Description...">
+        <input type="date" id="goalTarget" placeholder="Target date">
+        <button onclick="addGoal()" style="min-width: 120px;">
+            <i class="fas fa-plus"></i> Add Goal
+        </button>
+    </div>
+</div>
+
+<div class="glass-card">
+    <h2>Active Goals</h2>
+    <div id="goalsList" style="margin-top: 1rem;"></div>
+    <div id="emptyState" style="display: none; text-align: center; padding: 3rem; color: #b8d4e8;">
+        No active goals
+    </div>
+</div>
+
+<script>
+    async function loadGoals() {
+        const res = await fetch('/goals/api/all', { credentials: 'include' });
+        const goals = await res.json();
+        const list = document.getElementById('goalsList');
+        const emptyState = document.getElementById('emptyState');
+
+        const goalArray = Object.values(goals.goals || {});
+
+        if (!goalArray || goalArray.length === 0) {
+            list.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        list.style.display = 'block';
+        emptyState.style.display = 'none';
+
+        list.innerHTML = goalArray.map(goal => `
+        <div style="padding: 1rem; margin-bottom: 0.8rem; background: rgba(135, 206, 250, 0.05); border: 1px solid rgba(135, 206, 250, 0.2); border-radius: 4px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <div style="flex: 1;">
+                    <div style="font-size: 1.1rem; margin-bottom: 0.3rem; color: #87CEEB;">${goal.title}</div>
+                    <div style="font-size: 0.9rem; color: #b8d4e8;">${goal.description || 'No description'}</div>
+                    ${goal.target_date ? `<div style="font-size: 0.85rem; color: #b8d4e8; margin-top: 0.3rem;">Target: ${goal.target_date}</div>` : ''}
+                </div>
+                <button onclick="deleteGoal('${goal.id}')" 
+                        style="background: rgba(135, 206, 250, 0.1); border: 1px solid rgba(135, 206, 250, 0.3); padding: 0.5rem 1rem;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div style="margin-top: 0.5rem;">
+                <input type="range" min="0" max="100" value="${goal.progress || 0}" 
+                       onchange="updateProgress('${goal.id}', this.value)"
+                       style="width: 100%; accent-color: #87CEEB;">
+                <div style="font-size: 0.85rem; color: #87CEEB; margin-top: 0.3rem;">
+                    Progress: ${goal.progress || 0}%
+                </div>
+            </div>
+        </div>
+    `).join('');
+    }
+
+    async function addGoal() {
+        const title = document.getElementById('goalTitle').value.trim();
+        const description = document.getElementById('goalDesc').value.trim();
+        const target_date = document.getElementById('goalTarget').value;
+        if (!title) return;
+
+        await fetch('/goals/api/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ title, description, target_date })
+        });
+
+        document.getElementById('goalTitle').value = '';
+        document.getElementById('goalDesc').value = '';
+        document.getElementById('goalTarget').value = '';
+        loadGoals();
+    }
+
+    async function updateProgress(id, progress) {
+        await fetch(`/goals/api/progress/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ progress: parseInt(progress) })
+        });
+        loadGoals();
+    }
+
+    async function deleteGoal(id) {
+        await fetch(`/goals/api/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        loadGoals();
+    }
+
+    loadGoals();
+</script>
+{% endblock %}

@@ -1,0 +1,15 @@
+ai:
+  mode: "hybrid"
+  local:
+    enabled: true
+    model: "phi3:mini"
+    base_url: "http://localhost:11434"
+    num_ctx: 2048
+    num_thread: 2
+    num_gpu: 0
+  cloud:
+    enabled: true
+    provider: "openrouter"
+
+vector_db:
+  provider: "faiss"

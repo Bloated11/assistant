@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status - PHENOM AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            color: #e0f7ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(135, 206, 250, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #87CEEB;
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(135, 206, 250, 0.3);
+        }
+        
+        .refresh-btn {
+            background: rgba(135, 206, 250, 0.1);
+            border: 1px solid rgba(135, 206, 250, 0.3);
+            color: #87CEEB;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background: rgba(135, 206, 250, 0.2);
+            box-shadow: 0 0 20px rgba(135, 206, 250, 0.3);
+        }
+        
+        .back-btn {
+            background: rgba(135, 206, 250, 0.05);
+            border: 1px solid rgba(135, 206, 250, 0.2);
+            color: #87CEEB;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(135, 206, 250, 0.1);
+            transform: translateX(-2px);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(135, 206, 250, 0.2);
+            border-radius: 8px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            border-color: rgba(135, 206, 250, 0.4);
+            box-shadow: 0 4px 30px rgba(135, 206, 250, 0.2);
+        }
+        
+        .card h2 {
+            color: #87CEEB;
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(135, 206, 250, 0.2);
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(135, 206, 250, 0.1);
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: #b8d4e8;
+            font-weight: 500;
+        }
+        
+        .stat-value {
+            color: #e0f7ff;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-online {
+            background: rgba(135, 206, 250, 0.2);
+            color: #87CEEB;
+            border: 1px solid rgba(135, 206, 250, 0.3);
+        }
+        
+        .status-offline {
+            background: rgba(255, 100, 100, 0.2);
+            color: #ff6464;
+            border: 1px solid rgba(255, 100, 100, 0.3);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(135, 206, 250, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+            border: 1px solid rgba(135, 206, 250, 0.2);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #87CEEB 0%, #5a9fd4 100%);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(135, 206, 250, 0.5);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #b8d4e8;
+        }
+        
+        .module-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .module-item {
+            padding: 8px 12px;
+            background: rgba(135, 206, 250, 0.05);
+            border: 1px solid rgba(135, 206, 250, 0.2);
+            border-radius: 4px;
+            font-size: 13px;
+            color: #b8d4e8;
+        }
+        
+        .module-active {
+            background: rgba(135, 206, 250, 0.1);
+            color: #87CEEB;
+            border-color: rgba(135, 206, 250, 0.3);
+        }
+        
+        .module-inactive {
+            background: rgba(255, 100, 100, 0.1);
+            color: #ff6464;
+            border-color: rgba(255, 100, 100, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖥️ SYSTEM STATUS</h1>
+            <div>
+                <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+                <button class="refresh-btn" onclick="loadStatus()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <h2>Loading system status...</h2>
+        </div>
+        
+        <div id="status-grid" class="grid" style="display: none;"></div>
+    </div>
+    
+    <script>
+        async function loadStatus() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('status-grid').style.display = 'none';
+            
+            try {
+                const response = await fetch('/system/api/status');
+                const data = await response.json();
+                renderStatus(data);
+            } catch (error) {
+                console.error('Error loading status:', error);
+                document.getElementById('loading').innerHTML = '<h2 style="color: #ff6464;">Failed to load system status</h2>';
+            }
+        }
+        
+        function renderStatus(data) {
+            const grid = document.getElementById('status-grid');
+            grid.innerHTML = '';
+            
+            if (data.cpu) {
+                grid.innerHTML += createCpuCard(data.cpu);
+            }
+            
+            if (data.memory) {
+                grid.innerHTML += createMemoryCard(data.memory);
+            }
+            
+            if (data.gpu) {
+                grid.innerHTML += createGpuCard(data.gpu);
+            }
+            
+            if (data.ai) {
+                grid.innerHTML += createAiCard(data.ai);
+            }
+            
+            if (data.disk) {
+                grid.innerHTML += createDiskCard(data.disk);
+            }
+            
+            if (data.modules) {
+                grid.innerHTML += createModulesCard(data.modules);
+            }
+            
+            if (data.platform) {
+                grid.innerHTML += createPlatformCard(data.platform);
+            }
+            
+            document.getElementById('loading').style.display = 'none';
+            grid.style.display = 'grid';
+        }
+        
+        function createCpuCard(cpu) {
+            return `
+                <div class="card">
+                    <h2>⚡ CPU</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">Cores</span>
+                        <span class="stat-value">${cpu.cores || 'N/A'}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Threads</span>
+                        <span class="stat-value">${cpu.threads || 'N/A'}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Usage</span>
+                        <span class="stat-value">${cpu.usage_percent?.toFixed(1) || 0}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${cpu.usage_percent || 0}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createMemoryCard(mem) {
+            return `
+                <div class="card">
+                    <h2>💾 MEMORY</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">Total</span>
+                        <span class="stat-value">${mem.total_gb || 'N/A'} GB</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Used</span>
+                        <span class="stat-value">${mem.used_gb || 'N/A'} GB</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Available</span>
+                        <span class="stat-value">${mem.available_gb || 'N/A'} GB</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${mem.percent || 0}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createGpuCard(gpu) {
+            let content = `
+                <div class="card">
+                    <h2>🎮 GPU</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">Status</span>
+                        <span class="stat-value">
+                            <span class="status-badge ${gpu.available ? 'status-online' : 'status-offline'}">
+                                ${gpu.available ? 'Available' : 'Not Detected'}
+                            </span>
+                        </span>
+                    </div>
+            `;
+            
+            if (gpu.available) {
+                content += `
+                    <div class="stat-row">
+                        <span class="stat-label">Type</span>
+                        <span class="stat-value">${gpu.type || 'Unknown'}</span>
+                    </div>
+                `;
+                
+                if (gpu.name) {
+                    content += `
+                        <div class="stat-row">
+                            <span class="stat-label">Name</span>
+                            <span class="stat-value">${gpu.name}</span>
+                        </div>
+                    `;
+                }
+                
+                if (gpu.memory_total_mb) {
+                    content += `
+                        <div class="stat-row">
+                            <span class="stat-label">Memory</span>
+                            <span class="stat-value">${(gpu.memory_total_mb / 1024).toFixed(1)} GB</span>
+                        </div>
+                    `;
+                }
+                
+                if (gpu.utilization_percent !== undefined) {
+                    content += `
+                        <div class="stat-row">
+                            <span class="stat-label">Utilization</span>
+                            <span class="stat-value">${gpu.utilization_percent}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gpu.utilization_percent}%"></div>
+                        </div>
+                    `;
+                }
+            }
+            
+            content += `</div>`;
+            return content;
+        }
+        
+        function createAiCard(ai) {
+            let content = `
+                <div class="card">
+                    <h2>🤖 AI SYSTEM</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">Mode</span>
+                        <span class="stat-value">${ai.mode || 'Unknown'}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Local LLM</span>
+                        <span class="stat-value">
+                            <span class="status-badge ${ai.local_available ? 'status-online' : 'status-offline'}">
+                                ${ai.local_available ? 'Online' : 'Offline'}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Cloud LLM</span>
+                        <span class="stat-value">
+                            <span class="status-badge ${ai.cloud_available ? 'status-online' : 'status-offline'}">
+                                ${ai.cloud_available ? 'Online' : 'Offline'}
+                            </span>
+                        </span>
+                    </div>
+            `;
+            
+            if (ai.loaded_models && ai.loaded_models.length > 0) {
+                content += `
+                    <div class="stat-row">
+                        <span class="stat-label">Loaded Models</span>
+                        <span class="stat-value">${ai.loaded_models.join(', ')}</span>
+                    </div>
+                `;
+            }
+            
+            content += `</div>`;
+            return content;
+        }
+        
+        function createDiskCard(disk) {
+            return `
+                <div class="card">
+                    <h2>💿 DISK</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">Total</span>
+                        <span class="stat-value">${disk.total_gb || 'N/A'} GB</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Used</span>
+                        <span class="stat-value">${disk.used_gb || 'N/A'} GB</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Free</span>
+                        <span class="stat-value">${disk.free_gb || 'N/A'} GB</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${disk.percent || 0}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createModulesCard(modules) {
+            let content = `
+                <div class="card">
+                    <h2>📦 MODULES</h2>
+                    <div class="module-list">
+            `;
+            
+            for (const [name, available] of Object.entries(modules)) {
+                const displayName = name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                content += `
+                    <div class="module-item ${available ? 'module-active' : 'module-inactive'}">
+                        ${available ? '✓' : '✗'} ${displayName}
+                    </div>
+                `;
+            }
+            
+            content += `
+                    </div>
+                </div>
+            `;
+            return content;
+        }
+        
+        function createPlatformCard(platform) {
+            return `
+                <div class="card">
+                    <h2>🖥️ PLATFORM</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">OS</span>
+                        <span class="stat-value">${platform.system || 'Unknown'}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Version</span>
+                        <span class="stat-value">${platform.release || 'Unknown'}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Architecture</span>
+                        <span class="stat-value">${platform.machine || 'Unknown'}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Python</span>
+                        <span class="stat-value">${platform.python_version || 'Unknown'}</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        loadStatus();
+        setInterval(loadStatus, 3000);
+    </script>
+</body>
+</html>
